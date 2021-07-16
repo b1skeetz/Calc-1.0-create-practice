@@ -52,7 +52,7 @@ namespace WinFormsApp1
             int chetchik = 0;
             for(int i = 0; i < str_lenth; i++)
             {
-                if(str[i] == '+' || str[i] == '-'|| str[i] == '*'|| str[i] == '/')
+                if(str[i] == '+' || str[i] == '-'|| str[i] == '*'|| str[i] == '/' || str[i] == '^')
                 {
                     numbers[chetchik] = Convert.ToDouble(temp);
                     chetchik++;
@@ -65,9 +65,41 @@ namespace WinFormsApp1
                 }
             }
             numbers[chetchik] = Convert.ToDouble(temp);
-
-
             return numbers;
+        }
+
+        public double counting(double num1, double num2, char sym)
+        {
+            switch (sym)
+            {
+                case '+':
+                    return num1 + num2;
+                    
+                case '-':
+                    return num1 - num2;
+                    
+                case '*':
+                    return num1 * num2;
+                    
+                case '/':
+                    return num1 / num2;
+                    
+                case '^':
+                    return Math.Pow(num1, num2);
+                    
+            }
+            return 0;
+        }
+
+        public char[] reSize(char[] mas, char sym)
+        {
+            char[] newMas = new char[mas.Length + 1];
+            for(int i = 0; i < mas.Length; i++)
+            {
+                newMas[i] = mas[i];
+            }
+            newMas[newMas.Length - 1] = sym;
+            return newMas;
         }
     }
 }
