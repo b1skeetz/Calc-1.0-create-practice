@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Numerics;
+using System.Collections;
+using System.Drawing.Drawing2D;
 
 
 namespace WinFormsApp1
@@ -19,19 +22,20 @@ namespace WinFormsApp1
         bool isPoint = false; // разделитель для точки 
         int newSize = 4;
         int chet = 0;
-        char[] arr_sym = new char[4];
+        static int sizeArr = 0;
+        char[] arr_sym = new char[sizeArr];
+        double[] numbers = new double[0];
+        Stack<double> stackForNumbers = new Stack<double>();
+        Stack<char> stackForOperations = new Stack<char>();
+        Test_form form = new Test_form();
 
         public Form1()
         {
             InitializeComponent();
+            this.Region = new Region(func.RoundedRect(new Rectangle(0, 0, this.Width, this.Height), 10));
         }
 
         private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void main_button_Click(object sender, EventArgs e)
         {
             
         }
@@ -97,27 +101,22 @@ namespace WinFormsApp1
             func.WriteText(zero, textBox1);
             sym = ' ';
         }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//------------------------------------------------------------------------------------//
         private void plus_Click(object sender, EventArgs e)
         {
-            if(sym != Convert.ToChar(plus.Text))
+            if (sym != Convert.ToChar(plus.Text))
             {
                 sym = func.replase_sym(sym, textBox1, plus, isPoint, '+'); // запись нового 
-                    arr_sym[chet] = sym;
-                    chet++;
-                
+                arr_sym = func.reSize(arr_sym, sym);
             }
         }
-//--------------------------------------------------------------------------------------------------------
+        
         private void mines_Click(object sender, EventArgs e)
         {
             if (sym != Convert.ToChar(mines.Text))
             {
                 sym = func.replase_sym(sym, textBox1, mines, isPoint, '-'); // запись нового символа
-                arr_sym[chet] = sym;
-                chet++;
+                arr_sym = func.reSize(arr_sym, sym);
             }
         }
 
@@ -126,98 +125,43 @@ namespace WinFormsApp1
             if (sym != Convert.ToChar(multy.Text))
             {
                 sym = func.replase_sym(sym, textBox1, multy, isPoint, '*'); // запись нового символа
-                arr_sym[chet] = sym;
-                chet++;
+                arr_sym = func.reSize(arr_sym, sym);
             }
-        }   
+        }
 
         private void delit_Click(object sender, EventArgs e)
         {
             if (sym != Convert.ToChar(delit.Text))
             {
                 sym = func.replase_sym(sym, textBox1, delit, isPoint, '/'); // запись нового символа
-                arr_sym[chet] = sym;
-                chet++;
+                arr_sym = func.reSize(arr_sym, sym);
             }
         }
-
+//------------------------------------------------------------------------------------//
         private void equal_Click(object sender, EventArgs e)
         {
-            double[] numbers = func.mySplit(textBox1.Text);
-            MessageBox.Show(numbers[0].ToString(), numbers[1].ToString());
-            //string[] temp_number = new string[4];
-            //Stack<int> all_expression = new Stack<int>();
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    //Convert.ToString(textBox1.Text.Split(arr_sym[i]));
-            //    temp_number[i] = Convert.ToString(textBox1.Text.Split(arr_sym[i]));
-            //    all_expression.Push(Convert.ToInt32(temp_number[i]));
-            //}
-            //for (int i = 0; i < newSize; i++)
-            //{
-            //    while (all_expression.Any())
-            //    {
-            //        char temp = arr_sym[i];
-            //        switch (temp)
-            //        {
-            //            case '+':
-            //                int local_temp = 0;
-            //                local_temp = all_expression.Pop();
-            //                equals = local_temp + all_expression.Peek();
-
-            //                break;
-            //            case '-':
-
-            //                break;
-            //            case '*':
-
-            //                break;
-            //            case '/':
-
-            //                break;
-            //            case '^':
-
-            //                break;
-            //        }
-            //    }
-
-            //}
-
-            /*for (int j = 0; j < arr_sym.Length; j++)
+            numbers = func.mySplit(textBox1.Text);
+            /*func.stackInitNum(stackForNumbers, numbers);
+            for (int i = 0; i < arr_sym.Length; i++) // очистка стека от лишних нулей
             {
-                sym = arr_sym[j];
-                switch (sym)
-                {
-                    case '+':
-                        string[] arr_plus = textBox1.Text.Split(sym);
-                        for (int i = 0; i < arr_plus.Length; i++)
-                        {
-                            equals += Convert.ToDouble(arr_plus[i]);
-                        }
-                        break;
-                    case '-':
-                        string[] arr_minus = textBox1.Text.Split(sym);
-                        equals = Convert.ToDouble(arr_minus[0]) - Convert.ToDouble(arr_minus[1]);
-                        break;
-                    case '*':
-                        string[] arr_multy = textBox1.Text.Split(sym);
-                        equals = Convert.ToDouble(arr_multy[0]) * Convert.ToDouble(arr_multy[1]);
+                stackForNumbers.Pop();
+            }
+            func.stackInitSym(stackForOperations, arr_sym);*/
+            for (int i = 0; i < arr_sym.Length; i++)
+            {
+                numbers[i + 1] = func.counting(numbers[i], numbers[i + 1], arr_sym[i]);
+            }
+            equals = numbers[arr_sym.Length];
 
-                        break;
-                    case '/':
-                        string[] arr_delit = textBox1.Text.Split(sym);
-                        equals = Convert.ToDouble(arr_delit[0]) / Convert.ToDouble(arr_delit[1]);
-                        break;
-                    case '^':
-                        string[] arr_step = textBox1.Text.Split(sym);
-                        equals = func.my_pow(Convert.ToDouble(arr_step[0]), Convert.ToInt32(arr_step[1]));
-                        break;
-                }
-            }*/
+           // equals = func.solving(stackForNumbers, stackForOperations);
+            
+            
+
             func.WriteText(equal, textBox1); // добавление знака равно
-            textBox_answer.Text += Math.Round(equals, 3).ToString(); // округление до 3 знаков после запятой
+            textBox_answer.Text += Math.Round(equals, 2).ToString(); // округление до 3 знаков после запятой
             sym = ' '; // очистка символа действия
         }
+//------------------------------------------------------------------------------------//
 
         private void bClear_Click(object sender, EventArgs e)
         {
@@ -226,24 +170,28 @@ namespace WinFormsApp1
             textBox1.Text = "";
             isPoint = false;
             textBox_answer.Text = "";
+            arr_sym = new char[0];
+            numbers = new double[0];
+            stackForNumbers.Clear();
+            stackForOperations.Clear();
         }
 
         private void bFact_Click(object sender, EventArgs e)
         {
             int res = 1;
             int fact = int.Parse(textBox1.Text);
-            for(int i = 1; i <= fact; i++)
+            for (int i = 1; i <= fact; i++)
             {
                 res *= i;
             }
-            textBox1.Text = res.ToString();
+            textBox_answer.Text = res.ToString();
         }
 
         private void bSqrt_Click(object sender, EventArgs e)
         {
             int sqrt = int.Parse(textBox1.Text);
             double res = Math.Sqrt(sqrt);
-            textBox1.Text = res.ToString();
+            textBox_answer.Text = Math.Round(res, 2).ToString(); ;
         }
 
         private void bPow_Click(object sender, EventArgs e)
@@ -251,6 +199,7 @@ namespace WinFormsApp1
             if (sym != Convert.ToChar(bPow.Text))
             {
                 sym = func.replase_sym(sym, textBox1, bPow, isPoint, '^'); // запись нового символа 
+                arr_sym = func.reSize(arr_sym, sym);
             }
         }
 
@@ -273,6 +222,76 @@ namespace WinFormsApp1
 
         }
 
-        
+        private void seven_MouseEnter(object sender, EventArgs e)
+        {
+            seven.BackColor = Color.FromArgb(227, 25, 183);
+        }
+
+        private void seven_MouseLeave(object sender, EventArgs e)
+        {
+            seven.BackColor = Color.Orange;
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void label3_MouseEnter(object sender, EventArgs e)
+        {
+            label3.BackColor = Color.LightGreen;
+            
+        }
+
+        private void label3_MouseLeave(object sender, EventArgs e)
+        {
+            label3.BackColor = Color.Orange;
+        }
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            base.Capture = false;
+            Message m = Message.Create(base.Handle, 0xa1, new IntPtr(2), IntPtr.Zero);
+            this.WndProc(ref m);
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void label4_MouseEnter(object sender, EventArgs e)
+        {
+            label4.BackColor = Color.LightGreen;
+        }
+
+        private void label4_MouseLeave(object sender, EventArgs e)
+        {
+            label4.BackColor = Color.Orange;
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Maximized;
+        }
+
+        private void label5_MouseEnter(object sender, EventArgs e)
+        {
+            label5.BackColor = Color.LightGreen;
+        }
+
+        private void label5_MouseLeave(object sender, EventArgs e)
+        {
+            label5.BackColor = Color.Orange;
+        }
+
+        private void textBox_answer_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox_answer.Text == "123")
+            {
+                this.Hide();
+                form.ShowDialog();
+            }
+        }
     }
 }
