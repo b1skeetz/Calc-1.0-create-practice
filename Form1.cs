@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Numerics;
+using System.Collections;
+using System.Drawing.Drawing2D;
 
 
 namespace WinFormsApp1
@@ -23,24 +25,19 @@ namespace WinFormsApp1
         static int sizeArr = 0;
         char[] arr_sym = new char[sizeArr];
         double[] numbers = new double[0];
-        // 6 / 2 + 4 * 3
-        // + 
-        // 6  2 4  3
-
+        Stack<double> stackForNumbers = new Stack<double>();
+        Stack<char> stackForOperations = new Stack<char>();
+        Test_form form = new Test_form();
 
         public Form1()
         {
             InitializeComponent();
+            this.Region = new Region(func.RoundedRect(new Rectangle(0, 0, this.Width, this.Height), 10));
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             
-        }
-
-        private void main_button_Click(object sender, EventArgs e)
-        {
-
         }
 
 
@@ -144,12 +141,21 @@ namespace WinFormsApp1
         private void equal_Click(object sender, EventArgs e)
         {
             numbers = func.mySplit(textBox1.Text);
+            /*func.stackInitNum(stackForNumbers, numbers);
+            for (int i = 0; i < arr_sym.Length; i++) // очистка стека от лишних нулей
+            {
+                stackForNumbers.Pop();
+            }
+            func.stackInitSym(stackForOperations, arr_sym);*/
             for (int i = 0; i < arr_sym.Length; i++)
             {
                 numbers[i + 1] = func.counting(numbers[i], numbers[i + 1], arr_sym[i]);
             }
             equals = numbers[arr_sym.Length];
 
+           // equals = func.solving(stackForNumbers, stackForOperations);
+            
+            
 
             func.WriteText(equal, textBox1); // добавление знака равно
             textBox_answer.Text += Math.Round(equals, 2).ToString(); // округление до 3 знаков после запятой
@@ -166,6 +172,8 @@ namespace WinFormsApp1
             textBox_answer.Text = "";
             arr_sym = new char[0];
             numbers = new double[0];
+            stackForNumbers.Clear();
+            stackForOperations.Clear();
         }
 
         private void bFact_Click(object sender, EventArgs e)
@@ -214,6 +222,76 @@ namespace WinFormsApp1
 
         }
 
+        private void seven_MouseEnter(object sender, EventArgs e)
+        {
+            seven.BackColor = Color.FromArgb(227, 25, 183);
+        }
 
+        private void seven_MouseLeave(object sender, EventArgs e)
+        {
+            seven.BackColor = Color.Orange;
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void label3_MouseEnter(object sender, EventArgs e)
+        {
+            label3.BackColor = Color.LightGreen;
+            
+        }
+
+        private void label3_MouseLeave(object sender, EventArgs e)
+        {
+            label3.BackColor = Color.Orange;
+        }
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            base.Capture = false;
+            Message m = Message.Create(base.Handle, 0xa1, new IntPtr(2), IntPtr.Zero);
+            this.WndProc(ref m);
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void label4_MouseEnter(object sender, EventArgs e)
+        {
+            label4.BackColor = Color.LightGreen;
+        }
+
+        private void label4_MouseLeave(object sender, EventArgs e)
+        {
+            label4.BackColor = Color.Orange;
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Maximized;
+        }
+
+        private void label5_MouseEnter(object sender, EventArgs e)
+        {
+            label5.BackColor = Color.LightGreen;
+        }
+
+        private void label5_MouseLeave(object sender, EventArgs e)
+        {
+            label5.BackColor = Color.Orange;
+        }
+
+        private void textBox_answer_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox_answer.Text == "123")
+            {
+                this.Hide();
+                form.ShowDialog();
+            }
+        }
     }
 }
